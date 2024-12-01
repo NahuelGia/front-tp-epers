@@ -4,12 +4,13 @@ import { Card } from "./components/card";
 import { Shuffle } from "lucide-react";
 import FlipCardButton from "./components/flipCardButton";
 import { WinnerComponent } from "./components/winnerComponent";
+import { Wheel } from "react-custom-roulette";
 
 const mockedCards = [
 	{
 		id: 1,
 		name: "Persistir a lo Gradle",
-		score: 85,
+		score: 95,
 		isFlipped: false,
 		palabrasUsadas: [
 			"hola",
@@ -202,6 +203,10 @@ export default function CardsGame() {
 	const [winner, setWinner] = useState(null);
 	const [usedWords, setUsedWords] = useState([]);
 	const [areAllFlipped, setAreAllFlipped] = useState(false);
+	const [isTie, setIsTie] = useState(false);
+	const [tiePlayers, setTiePlayers] = useState([]);
+	const [prizeIndex, setPrizeIndex] = useState(null);
+	const [startSpin, setStartSpin] = useState(false);
 
 	const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -210,19 +215,32 @@ export default function CardsGame() {
 	}, [rituals]);
 
 	useEffect(() => {
+		// collect used words
 		const allWords = rituals.flatMap((ritual) => ritual?.palabrasUsadas || []);
 
 		const uniqueWords = Array.from(new Set(allWords));
 
 		setUsedWords(uniqueWords);
 
+		// Handle winner
 		if (rituals.length > 0) {
-			const winner = rituals.reduce((acc, ritual) =>
-				acc.score >= ritual.score ? acc : ritual
-			);
-			setWinner(winner);
+			const maxScore = Math.max(...rituals.map((ritual) => ritual.score));
+			const topPlayers = rituals.filter((ritual) => ritual.score === maxScore);
+
+			if (topPlayers.length > 1) {
+				// Tie case
+				setIsTie(true);
+				setTiePlayers(topPlayers);
+			} else {
+				// Winner case
+				setWinner(topPlayers[0]);
+				setIsTie(false);
+				setTiePlayers([]);
+			}
 		} else {
 			setWinner(null);
+			setIsTie(false);
+			setTiePlayers([]);
 		}
 	}, [rituals]);
 
@@ -255,6 +273,11 @@ export default function CardsGame() {
 		);
 	};
 
+	const wheelData = tiePlayers.map((player) => ({
+		option: player.name,
+	}));
+
+
 	return (
 		<div className="min-h-screen bg-gray-900 pt-[5rem] p-8">
 			<div className="max-w-6xl mx-auto">
@@ -282,10 +305,60 @@ export default function CardsGame() {
 						);
 					})}
 				</div>
-				{areAllFlipped && (
+				{areAllFlipped && winner && (
 					<WinnerComponent ritual={winner} usedWords={usedWords} />
 				)}
 			</div>
+
+			{isTie && areAllFlipped && (
+				<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+					<div className="bg-white rounded-lg p-8">
+						<h2 className="text-2xl font-bold mb-4">¡Empate!</h2>
+						<p>Los jugadores empatados son:</p>
+						<ul className="mb-4">
+							{tiePlayers.map((player) => (
+								<li key={player.id} className="text-lg">
+									{player.name} (Score: {player.score})
+								</li>
+							))}
+						</ul>
+						<div className="parent-container">
+							<Wheel
+								mustStartSpinning={startSpin}
+								prizeNumber={prizeIndex}
+								data={wheelData}
+								onStopSpinning={() => {
+									const winner = tiePlayers[prizeIndex];
+									setWinner(winner);
+									setIsTie(false);
+									setStartSpin(false);
+								}}
+								textColors={["#000"]}
+								fontSize={18} 
+								outerBorderColor="#ccc"
+								outerBorderWidth={8}
+								innerBorderColor="#f0f0f0"
+								innerBorderWidth={6}
+								innerRadius={5}
+								backgroundColors={["#FFF", "#FFC107"]} 
+							/>
+						</div>
+
+						<button
+							onClick={() => {
+								const randomIndex = Math.floor(
+									Math.random() * tiePlayers.length
+								);
+								setPrizeIndex(randomIndex);
+								setStartSpin(true);
+							}}
+							className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700"
+						>
+							Girar Ruleta
+						</button>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
