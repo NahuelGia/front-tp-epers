@@ -5,6 +5,7 @@ import { Shuffle } from "lucide-react";
 import FlipCardButton from "./components/flipCardButton";
 import { WinnerComponent } from "./components/winnerComponent";
 import { Wheel } from "react-custom-roulette";
+import axios from "axios";
 
 const mockedCards = [
 	{
@@ -199,7 +200,7 @@ const mockedCards = [
 ];
 
 export default function CardsGame() {
-	const [rituals, setRituals] = useState(mockedCards);
+	const [rituals, setRituals] = useState([]);
 	const [winner, setWinner] = useState(null);
 	const [usedWords, setUsedWords] = useState([]);
 	const [areAllFlipped, setAreAllFlipped] = useState(false);
@@ -207,8 +208,17 @@ export default function CardsGame() {
 	const [tiePlayers, setTiePlayers] = useState([]);
 	const [prizeIndex, setPrizeIndex] = useState(null);
 	const [startSpin, setStartSpin] = useState(false);
+	const [mustStopAtIndex, setMustStopAtIndex] = useState(0);
 
 	const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const res = await axios.get("http://localhost:8080/ritual");
+			setRituals(res.data);
+		};
+		fetchData();
+	}, []);
 
 	useEffect(() => {
 		setAreAllFlipped(rituals.every((card) => card.isFlipped));
@@ -224,8 +234,8 @@ export default function CardsGame() {
 
 		// Handle winner
 		if (rituals.length > 0) {
-			const maxScore = Math.max(...rituals.map((ritual) => ritual.score));
-			const topPlayers = rituals.filter((ritual) => ritual.score === maxScore);
+			const maxScore = Math.max(...rituals.map((ritual) => ritual.puntaje));
+			const topPlayers = rituals.filter((ritual) => ritual.puntaje === maxScore);
 
 			if (topPlayers.length > 1) {
 				// Tie case
@@ -273,10 +283,13 @@ export default function CardsGame() {
 		);
 	};
 
-	const wheelData = tiePlayers.map((player) => ({
+	const wheelData = tiePlayers.map((player, index) => ({
 		option: player.name,
+		style: {
+			backgroundColor: index % 2 === 0 ? "#7bbf2b" : "#080808",
+			textColor: index % 2 === 0 ? "#080808" : "#ffff",
+		},
 	}));
-
 
 	return (
 		<div className="min-h-screen bg-gray-900 pt-[5rem] p-8">
@@ -297,8 +310,8 @@ export default function CardsGame() {
 						return (
 							<Card
 								key={ritual.id}
-								name={ritual.name}
-								score={ritual.score}
+								name={ritual.nombre}
+								score={ritual.puntaje}
 								isFlipped={ritual.isFlipped}
 								onFlip={() => flipCard(ritual.id)}
 							/>
@@ -318,14 +331,14 @@ export default function CardsGame() {
 						<ul className="mb-4">
 							{tiePlayers.map((player) => (
 								<li key={player.id} className="text-lg">
-									{player.name} (Score: {player.score})
+									{player.nombre} (Score: {player.puntaje})
 								</li>
 							))}
 						</ul>
 						<div className="parent-container">
 							<Wheel
 								mustStartSpinning={startSpin}
-								prizeNumber={prizeIndex}
+								prizeNumber={0}
 								data={wheelData}
 								onStopSpinning={() => {
 									const winner = tiePlayers[prizeIndex];
@@ -333,14 +346,13 @@ export default function CardsGame() {
 									setIsTie(false);
 									setStartSpin(false);
 								}}
-								textColors={["#000"]}
-								fontSize={18} 
-								outerBorderColor="#ccc"
+								fontSize={18}
+								outerBorderColor="#5a616f"
 								outerBorderWidth={8}
-								innerBorderColor="#f0f0f0"
+								innerBorderColor="#5a616f"
+								radiusLineColor="#5a616f"
 								innerBorderWidth={6}
 								innerRadius={5}
-								backgroundColors={["#FFF", "#FFC107"]} 
 							/>
 						</div>
 
@@ -351,6 +363,7 @@ export default function CardsGame() {
 								);
 								setPrizeIndex(randomIndex);
 								setStartSpin(true);
+								setMustStopAtIndex(1);
 							}}
 							className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700"
 						>
