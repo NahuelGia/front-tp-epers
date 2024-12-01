@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "./components/card";
 
 import { Shuffle } from "lucide-react";
@@ -6,43 +6,237 @@ import FlipCardButton from "./components/flipCardButton";
 import { WinnerComponent } from "./components/winnerComponent";
 
 const mockedCards = [
-	{ id: 1, name: "Persistir a lo Gradle", score: 85, isFlipped: false },
-	{ id: 2, name: "Carlos", score: 92, isFlipped: false },
-	{ id: 3, name: "Epers Strikers", score: 78, isFlipped: false },
-	{ id: 4, name: "The EPERStrikes Back", score: 95, isFlipped: false },
-	{ id: 5, name: "Laura", score: 88, isFlipped: false },
-	{ id: 6, name: "Pedro", score: 73, isFlipped: false },
-	{ id: 7, name: "Pedro", score: 73, isFlipped: false },
-	{ id: 8, name: "Pedro", score: 73, isFlipped: false },
-	{ id: 9, name: "Pedro", score: 73, isFlipped: false },
-	{ id: 10, name: "Los angeles de guido", score: 73, isFlipped: false },
+	{
+		id: 1,
+		name: "Persistir a lo Gradle",
+		score: 85,
+		isFlipped: false,
+		palabrasUsadas: [
+			"hola",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+		],
+	},
+	{
+		id: 2,
+		name: "Carlos",
+		score: 92,
+		isFlipped: false,
+		palabrasUsadas: [
+			"hola",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+		],
+	},
+	{
+		id: 3,
+		name: "Epers Strikers",
+		score: 78,
+		isFlipped: false,
+		palabrasUsadas: [
+			"hola",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+		],
+	},
+	{
+		id: 4,
+		name: "The EPERStrikes Back",
+		score: 95,
+		isFlipped: false,
+		palabrasUsadas: [
+			"hola",
+			"palabra2",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+		],
+	},
+	{
+		id: 5,
+		name: "Laura",
+		score: 88,
+		isFlipped: false,
+		palabrasUsadas: [
+			"hola",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+		],
+	},
+	{
+		id: 6,
+		name: "Pedro",
+		score: 73,
+		isFlipped: false,
+		palabrasUsadas: [
+			"hola",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+		],
+	},
+	{
+		id: 8,
+		name: "Pedro",
+		score: 73,
+		isFlipped: false,
+		palabrasUsadas: [
+			"hola",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+		],
+	},
+	{
+		id: 9,
+		name: "Pedro",
+		score: 73,
+		isFlipped: false,
+		palabrasUsadas: [
+			"hola",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+		],
+	},
+	{
+		id: 10,
+		name: "Los angeles de guido",
+		score: 73,
+		isFlipped: false,
+		palabrasUsadas: [
+			"hola",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+			"perro",
+			"pera",
+			"casa",
+			"gato",
+			"pato",
+			"palo",
+		],
+	},
 ];
 
-const ganador = {
-	id: 4,
-	name: "Los angeles de guido",
-	score: 95,
-	isFlipped: false,
-	palabrasUsadas: ["hola", "perro", "pera", "casa", "gato", "pato", "palo", "perro", "pera", "casa", "gato", "pato", "palo"],
-};
-
 export default function CardsGame() {
-	const [cards, setCards] = useState(mockedCards);
+	const [rituals, setRituals] = useState(mockedCards);
 	const [winner, setWinner] = useState(null);
+	const [usedWords, setUsedWords] = useState([]);
+	const [areAllFlipped, setAreAllFlipped] = useState(false);
 
 	const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+	useEffect(() => {
+		setAreAllFlipped(rituals.every((card) => card.isFlipped));
+	}, [rituals]);
+
+	useEffect(() => {
+		const allWords = rituals.flatMap((ritual) => ritual?.palabrasUsadas || []);
+
+		const uniqueWords = Array.from(new Set(allWords));
+
+		setUsedWords(uniqueWords);
+
+		if (rituals.length > 0) {
+			const winner = rituals.reduce((acc, ritual) =>
+				acc.score >= ritual.score ? acc : ritual
+			);
+			setWinner(winner);
+		} else {
+			setWinner(null);
+		}
+	}, [rituals]);
+
 	const flipRandomCard = async () => {
-		setCards((prevCards) =>
+		setRituals((prevCards) =>
 			prevCards.map((card) => ({ ...card, isFlipped: false }))
 		);
 
 		await delay(500);
 
-		const shuffledCards = [...cards].sort(() => Math.random() - 0.5);
+		const shuffledCards = [...rituals].sort(() => Math.random() - 0.5);
 
 		for (const card of shuffledCards) {
-			setCards((prevCards) =>
+			setRituals((prevCards) =>
 				prevCards.map((c) => (c.id === card.id ? { ...c, isFlipped: true } : c))
 			);
 
@@ -51,10 +245,13 @@ export default function CardsGame() {
 	};
 
 	const flipCard = (id) => {
-		setCards((prevCards) =>
-			prevCards.map((card) =>
-				card.id === id ? { ...card, isFlipped: !card.isFlipped } : card
-			)
+		setRituals((prevCards) =>
+			prevCards.map((card) => {
+				if (card.id === id) {
+					return { ...card, isFlipped: !card.isFlipped };
+				}
+				return card;
+			})
 		);
 	};
 
@@ -73,18 +270,21 @@ export default function CardsGame() {
 				</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					{cards.map((card, index) => (
-						<Card
-							key={card.id}
-							name={card.name}
-							score={card.score}
-							isFlipped={card.isFlipped}
-							onFlip={() => flipCard(card.id)}
-						/>
-					))}
+					{rituals.map((ritual) => {
+						return (
+							<Card
+								key={ritual.id}
+								name={ritual.name}
+								score={ritual.score}
+								isFlipped={ritual.isFlipped}
+								onFlip={() => flipCard(ritual.id)}
+							/>
+						);
+					})}
 				</div>
-
-				<WinnerComponent ritual={ganador} />
+				{areAllFlipped && (
+					<WinnerComponent ritual={winner} usedWords={usedWords} />
+				)}
 			</div>
 		</div>
 	);
