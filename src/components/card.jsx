@@ -12,7 +12,7 @@ export function Card({ name, score, isFlipped, onFlip }) {
 				</div>
 
 				{/* Reverso de la carta */}
-				<div className="absolute w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-[#ebc35e] to-[#eb5777] rounded-xl p-6 flex flex-col justify-center items-center text-white shadow-xl">
+				<div className="absolute w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-[#7898d2] to-[#a0c8ed] rounded-xl p-6 flex flex-col justify-center items-center text-white shadow-xl">
 					<p className="text-[3rem]">Puntaje</p>
 					<p className="text-[2.5rem] font-bold mt-2">{score}</p>
 				</div>

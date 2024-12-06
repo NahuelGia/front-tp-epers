@@ -34,7 +34,7 @@ export function WinnerComponent({ ritual, usedWords }) {
 							{ritual.palabrasUsadas.map((word, index) => (
 								<span
 									key={index}
-									className={`bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-[2rem] text-center
+									className={`bg-gray-100 text-gray-800 px-1  py-1 rounded-full text-[2rem] text-center 
 										${itsPossible(word) ? "bg-green-400" : "bg-red-400"}
 										`}
 								>

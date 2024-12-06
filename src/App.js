@@ -283,8 +283,9 @@ export default function CardsGame() {
 		);
 	};
 
+
 	const wheelData = tiePlayers.map((player, index) => ({
-		option: player.name,
+		option: player.nombre,
 		style: {
 			backgroundColor: index % 2 === 0 ? "#7bbf2b" : "#080808",
 			textColor: index % 2 === 0 ? "#080808" : "#ffff",
