@@ -291,7 +291,7 @@ export default function CardsGame() {
 			textColor: index % 2 === 0 ? "#080808" : "#ffff",
 		},
 	}));
-
+	
 	return (
 		<div className="min-h-screen bg-gray-900 pt-[5rem] p-8">
 			<div className="max-w-6xl mx-auto">
@@ -342,7 +342,7 @@ export default function CardsGame() {
 								prizeNumber={0}
 								data={wheelData}
 								onStopSpinning={() => {
-									const winner = tiePlayers[prizeIndex];
+									const winner = tiePlayers[0];
 									setWinner(winner);
 									setIsTie(false);
 									setStartSpin(false);
