@@ -38,5 +38,11 @@ export const palabrasPosibles = [
 	"picaro",
     "persistencia",
     "modelo",
-    "tabla"
+    "tabla",
+	"gradle",
+    "atomicidad",
+    "nosql",
+    "sql",
+    "durabilidad",
+    "relacional"
 ];
